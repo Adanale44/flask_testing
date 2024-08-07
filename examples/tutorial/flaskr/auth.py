@@ -53,6 +53,7 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        email = request.form['email']
         db = get_db()
         error = None
 
@@ -60,17 +61,25 @@ def register():
             error = "Se requiere un usuario."
         elif not password:
             error = "Se requiere una contraseña."
+        elif not email:
+            error = 'Se requiere email.'
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
+                    "INSERT INTO user (username, password,email) VALUES (?, ?,?)",
+                    (username, generate_password_hash(password),email),
                 )
                 db.commit()
-            except db.IntegrityError:
+            except db.IntegrityError as e:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.
-                error = f"Este usuario {username} esta registrado."
+                mensaje = e.args[0]
+                print(mensaje)
+                
+                if "user.username" in mensaje:
+                    error = f"User {username} esta registrado"
+                elif "user.username" in mensaje:
+                    error = f"emil {email} ya esta registrado"
             else:
                 # Success, go to the login page.
                 return redirect(url_for("auth.login"))
@@ -95,7 +104,7 @@ def login():
         if user is None:
             error = "Usuario incorrecto o contraseña"
         elif not check_password_hash(user["password"], password):
-            error = "Contraseña incorrecta."
+            error = "Usuario incorrecto o contraseña"
 
         if error is None:
             # store the user id in a new session and return to the index
