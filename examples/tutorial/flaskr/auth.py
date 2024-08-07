@@ -60,7 +60,6 @@ def register():
             error = "Se requiere un usuario."
         elif not password:
             error = "Se requiere una contraseña."
-
         if error is None:
             try:
                 db.execute(
