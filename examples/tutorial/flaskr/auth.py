@@ -78,7 +78,7 @@ def register():
                 
                 if "user.username" in mensaje:
                     error = f"User {username} esta registrado"
-                elif "user.username" in mensaje:
+                elif "user.email" in mensaje:
                     error = f"emil {email} ya esta registrado"
             else:
                 # Success, go to the login page.
